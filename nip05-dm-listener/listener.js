@@ -35,11 +35,11 @@ export function createListener(pubkey, relays, signerSocketPath) {
   function subscribe(onMessage) {
     const since = Math.floor(Date.now() / 1000);
 
-    pool.subscribeMany(relays, [{
+    pool.subscribeMany(relays, {
       kinds: [4],
       '#p': [pubkey],
       since,
-    }], {
+    }, {
       onevent: async (event) => {
         // Skip our own messages
         if (event.pubkey === pubkey) return;

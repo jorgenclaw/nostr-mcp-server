@@ -5,8 +5,7 @@ After=network.target nostr-signer.service
 [Service]
 Type=simple
 WorkingDirectory=%h/nostr-mcp-server/nip05-dm-listener
-EnvironmentFile=%h/nostr-mcp-server/nip05-dm-listener/.env
-ExecStart=/usr/bin/node index.js
+ExecStart=/home/jorgenclaw/.nvm/versions/node/v22.22.0/bin/node --env-file=.env index.js
 Restart=always
 RestartSec=10
 
