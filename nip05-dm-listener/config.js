@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { nip19, getPublicKey } from 'nostr-tools';
+import { connect } from 'net';
 
 function requireEnv(name) {
   const val = process.env[name];
@@ -15,11 +15,38 @@ function hexToBytes(hex) {
   return bytes;
 }
 
-export function loadConfig() {
-  // --- Nostr identity ---
-  const nsec = requireEnv('JORGENCLAW_NSEC');
-  const { data: secretKey } = nip19.decode(nsec);
-  const pubkey = getPublicKey(secretKey);
+/**
+ * Get pubkey from the signing daemon.
+ */
+async function getPubkeyFromSigner(socketPath) {
+  return new Promise((resolve, reject) => {
+    const sock = connect(socketPath);
+    let data = '';
+    sock.on('connect', () => {
+      sock.write(JSON.stringify({ method: 'get_public_key' }));
+      sock.end();
+    });
+    sock.on('data', (chunk) => { data += chunk; });
+    sock.on('end', () => {
+      try {
+        const res = JSON.parse(data);
+        if (res.error) reject(new Error(res.error));
+        else resolve(res.pubkey);
+      } catch { reject(new Error(`Bad signer response: ${data}`)); }
+    });
+    sock.on('error', (err) => {
+      sock.destroy();
+      reject(new Error(`Cannot connect to signing daemon at ${socketPath}: ${err.message}`));
+    });
+  });
+}
+
+export async function loadConfig() {
+  // --- Signing daemon ---
+  const signerSocket = process.env.NOSTR_SIGNER_SOCKET
+    || `${process.env.XDG_RUNTIME_DIR || '/run/user/1000'}/nostr-signer.sock`;
+
+  const pubkey = await getPubkeyFromSigner(signerSocket);
 
   // --- Cloudflare ---
   const cfApiToken = requireEnv('CF_API_TOKEN');
@@ -45,6 +72,7 @@ export function loadConfig() {
   if (!nwcWalletPubkey || !nwcRelay || !nwcSecret) {
     throw new Error('Invalid NWC connection string');
   }
+  const { getPublicKey } = await import('nostr-tools/pure');
   const nwcSecretKey = hexToBytes(nwcSecret);
   const nwcClientPubkey = getPublicKey(nwcSecretKey);
 
@@ -55,7 +83,7 @@ export function loadConfig() {
   const reservedNames = ['jorgenclaw', 'scott', 'admin', 'nostr', 'api', 'well-known', 'support', '_', 'www'];
 
   return {
-    secretKey,
+    signerSocket,
     pubkey,
     cfApiToken,
     cfAccountId,

@@ -4,6 +4,9 @@
  *
  * Listens for NIP-04 DMs, processes "register NAME" commands,
  * generates Lightning invoices via NWC, and writes to Cloudflare KV.
+ *
+ * The nsec never touches this process — all signing and encryption
+ * is delegated to the nostr-signer daemon via Unix socket.
  */
 
 import { loadConfig } from './config.js';
@@ -11,9 +14,9 @@ import { createListener } from './listener.js';
 import { createInvoiceManager } from './invoice.js';
 import { createRegistry } from './registry.js';
 
-const config = loadConfig();
+const config = await loadConfig();
 
-const listener = createListener(config.secretKey, config.pubkey, config.relays);
+const listener = createListener(config.pubkey, config.relays, config.signerSocket);
 const invoices = createInvoiceManager(config.nwc);
 const registry = createRegistry(config.cfAccountId, config.cfKvNamespaceId, config.cfApiToken);
 
@@ -103,7 +106,7 @@ async function handleDM(senderPubkey, plaintext) {
     .then(async (paid) => {
       const entry = pending.get(paymentHash);
       pending.delete(paymentHash);
-      if (!entry) return; // Already cleaned up
+      if (!entry) return;
 
       if (!paid) {
         await listener.sendDM(entry.pubkey,
@@ -142,3 +145,4 @@ listener.subscribe(handleDM);
 console.log(`[nip05-dm-listener] Listening as ${config.pubkey.slice(0, 12)}...`);
 console.log(`[nip05-dm-listener] Price: ${config.priceSats} sats`);
 console.log(`[nip05-dm-listener] Relays: ${config.relays.join(', ')}`);
+console.log(`[nip05-dm-listener] Signer: ${config.signerSocket}`);
