@@ -1,0 +1,16 @@
+{
+  "name": "nip05-dm-listener",
+  "version": "1.0.0",
+  "description": "NIP-05 registration daemon — listens for DMs, generates invoices, writes to Cloudflare KV",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "nostr-tools": "^2.10.4",
+    "ws": "^8.16.1"
+  }
+}
