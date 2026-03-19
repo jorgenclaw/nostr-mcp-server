@@ -1,5 +1,17 @@
 # nostr-mcp-server
 
+
+## Live SSE Endpoint
+
+Connect directly without running locally:
+
+```
+https://mcp.jorgenclaw.ai/sse
+```
+
+Compatible with any MCP client that supports SSE transport (Claude Desktop, Cursor, etc.).
+
+
 A Nostr MCP (Model Context Protocol) server with **NIP-46 remote signing** support. Private keys never need to touch the AI context window.
 
 ## Features
