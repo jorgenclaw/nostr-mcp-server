@@ -6,7 +6,7 @@
 Connect directly without running locally:
 
 ```
-https://mcp.jorgenclaw.ai/sse
+https://nostr.jorgenclaw.ai/sse
 ```
 
 Compatible with any MCP client that supports SSE transport (Claude Desktop, Cursor, etc.).
