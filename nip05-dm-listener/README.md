@@ -5,7 +5,7 @@ Automated NIP-05 registration for `jorgenclaw.ai`. Listens for Nostr DMs, genera
 ## How It Works
 
 1. Someone sends a NIP-04 DM to Jorgenclaw: `register myname`
-2. Daemon replies with a Lightning invoice (1000 sats)
+2. Daemon replies with a Lightning invoice (5,000 sats)
 3. Sender pays the invoice
 4. Daemon detects payment via NWC `lookup_invoice` polling
 5. Daemon writes `myname → pubkey` to Cloudflare KV
@@ -32,7 +32,7 @@ npm start
 | `NWC_CONNECTION_STRING` | Yes* | NWC connection string for invoice generation |
 | `NWC_CONFIG_PATH` | No | Path to JSON file with connection string |
 | `RELAYS` | No | Comma-separated relay URLs (default: damus, nos.lol, nostr.band) |
-| `PRICE_SATS` | No | Registration price (default: 1000) |
+| `PRICE_SATS` | No | Registration price (default: 5000) |
 | `PAYMENT_TIMEOUT_MS` | No | Invoice expiry (default: 600000 / 10 min) |
 
 ## Running as a Service

@@ -77,8 +77,8 @@ export async function loadConfig() {
   const nwcClientPubkey = getPublicKey(nwcSecretKey);
 
   // --- Options ---
-  const relays = (process.env.RELAYS || 'wss://relay.damus.io,wss://nos.lol,wss://relay.nostr.band').split(',');
-  const priceSats = parseInt(process.env.PRICE_SATS || '1000');
+  const relays = (process.env.RELAYS || 'wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol,wss://relay.nostr.band').split(',');
+  const priceSats = parseInt(process.env.PRICE_SATS || '5000');
   const paymentTimeoutMs = parseInt(process.env.PAYMENT_TIMEOUT_MS || '600000');
   const reservedNames = ['jorgenclaw', 'scott', 'admin', 'nostr', 'api', 'well-known', 'support', '_', 'www'];
 
